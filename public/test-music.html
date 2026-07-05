@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Green Day - Music Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            gap: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            background: #00ff88;
+            color: #1a1a2e;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #00cc6a;
+        }
+        #status {
+            font-size: 24px;
+            margin: 20px;
+        }
+        #log {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .warning {
+            background: rgba(255,200,0,0.2);
+            border: 2px solid #ffc800;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>� Green Day - Last Night on Earth</h1>
+    <div id="status">⏸️ No Music</div>
+    
+    <div class="warning">
+        ⚠️ Make sure <strong>last-night-on-earth.mp3</strong> is in the public folder!
+    </div>
+    
+    <button onclick="playMusic()">▶️ Play Green Day</button>
+    <button onclick="stopMusic()">⏹️ Stop Music</button>
+    <div id="log"></div>
+
+    <script>
+        let audio = null;
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${time}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(playing) {
+            document.getElementById('status').textContent = playing ? '� Green Day Playing!' : '⏸️ No Music';
+        }
+
+        function playMusic() {
+            log('🎯 Play button clicked');
+            
+            if (audio) {
+                log('Reusing existing audio element');
+                audio.play().then(() => {
+                    log('✅ Green Day started successfully!');
+                    updateStatus(true);
+                }).catch(e => {
+                    log('❌ Error: ' + e.message);
+                });
+                return;
+            }
+
+            log('Creating new audio element...');
+            audio = new Audio('/last-night-on-earth.mp3');
+            audio.loop = true;
+            audio.volume = 0.5;
+
+            audio.addEventListener('canplay', () => log('✅ Green Day song loaded and ready!'));
+            audio.addEventListener('playing', () => {
+                log('� Green Day - Last Night on Earth is playing!');
+                updateStatus(true);
+            });
+            audio.addEventListener('pause', () => {
+                log('⏸️ Audio paused');
+                updateStatus(false);
+            });
+            audio.addEventListener('error', (e) => {
+                log('❌ Audio error: File not found!');
+                log('⚠️ Make sure last-night-on-earth.mp3 is in the public folder');
+                alert('⚠️ Music file not found!\n\nPlease put "last-night-on-earth.mp3" in:\nc:\\Users\\jcanl\\Downloads\\Create requested design\\public\\');
+            });
+
+            log('Loading Green Day song...');
+            audio.load();
+            
+            log('Attempting to play...');
+            audio.play()
+                .then(() => {
+                    log('✅ SUCCESS! Green Day is playing! 🎸');
+                    updateStatus(true);
+                })
+                .catch(error => {
+                    log('⚠️ Autoplay blocked: ' + error.message);
+                    log('💡 Click play again after user interaction');
+                    updateStatus(false);
+                });
+        }
+
+        function stopMusic() {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+                log('⏹️ Music stopped');
+                updateStatus(false);
+            }
+        }
+
+        log('Test page loaded.');
+        log('📁 Expecting file: /last-night-on-earth.mp3');
+        log('Click "Play Green Day" to test.');
+    </script>
+</body>
+</html>
